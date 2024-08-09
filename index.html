@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZXing Barcode Scanner</title>
+    <style>
+        #video {
+            width: 50%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>ZXing Barcode Scanner</h1>
+    <video id="video" autoplay></video>
+    <input type="text" id="barcode-result" readonly placeholder="Codul de bare sau QR code">
+    <button id="start-scan">Începe Scanarea</button>
+
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script>
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+        const videoElement = document.getElementById('video');
+        const resultInput = document.getElementById('barcode-result');
+        const startScanButton = document.getElementById('start-scan');
+
+        let scanning = false;
+
+        function startScanning() {
+            if (scanning) return; 
+            scanning = true;
+            
+            codeReader
+                .listVideoInputDevices()
+                .then((videoInputDevices) => {
+                    const firstDeviceId = videoInputDevices[0].deviceId;
+                    codeReader.decodeFromVideoDevice(firstDeviceId, videoElement, (result, error) => {
+                        if (result) {
+                            resultInput.value = result.text; 
+                            console.log('Cod detectat:', result.text);
+                            scanning = false;
+                        }
+                        if (error) {
+                            console.error('Eroare de scanare:', error);
+                        }
+                    });
+                })
+                .catch((err) => {
+                    console.error('Eroare la inițializarea camerei:', err);
+                });
+        }
+
+        startScanButton.addEventListener('click', startScanning);
+    </script>
+</body>
+</html>
