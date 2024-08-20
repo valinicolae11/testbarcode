@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+</head>
+<body>
+    <h1>Barcode Scanner</h1>
+    <video id="video" width="300" height="200" autoplay></video>
+    <button id="startButton">Start Scan</button>
+    <div id="result"></div>
+    
+    <script>
+        
+if (!('BarcodeDetector' in window)) {
+    alert('Browserul nu suporta Barcode Detection API');
+} else {
+    const video = document.getElementById('video');
+    const startButton = document.getElementById('startButton');
+    const resultDiv = document.getElementById('result');
+    let scannerActive = false;
+
+    const barcodeDetector = new BarcodeDetector({ formats: ['qr_code', 'code_128', 'ean_13'] });
+
+    startButton.addEventListener('click', () => {
+        if (!scannerActive) {
+            startVideo();
+            scannerActive = true;
+            startButton.textContent = 'Stop Scan';
+        } else {
+            stopVideo();
+            scannerActive = false;
+            startButton.textContent = 'Start Scan';
+        }
+    });
+
+    function startVideo() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
+                video.srcObject = stream;
+                video.play();
+                scanBarcode();
+            })
+            .catch(err => {
+                console.error('Eroare la accesarea camerei:', err);
+            });
+    }
+
+    function stopVideo() {
+        const stream = video.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+    }
+
+    function scanBarcode() {
+        barcodeDetector.detect(video)
+            .then(barcodes => {
+                if (barcodes.length > 0) {
+                    barcodes.forEach(barcode => {
+                        resultDiv.textContent = `Cod de bare detectat: ${barcode.rawValue}`;
+                        stopVideo(); 
+                        scannerActive = false;
+                        startButton.textContent = 'Start Scan';
+                    });
+                } else if (scannerActive) {
+                    requestAnimationFrame(scanBarcode); 
+                }
+            })
+            .catch(err => {
+                console.error('Eroare la detectarea codului de bare:', err);
+            });
+    }
+}
+
+    </script>
+</body>
+</html>

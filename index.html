@@ -14,8 +14,8 @@
 <body>
     <h1>ZXing Barcode Scanner</h1>
     <video id="video" autoplay></video>
-    <input type="text" id="barcode-result" readonly placeholder="Codul de bare sau QR code">
-    <button id="start-scan">Începe Scanarea</button>
+    <input type="text" id="barcode-result" readonly placeholder="Codul de bare">
+    <button id="start-scan">scaneaza</button>
 
     <script src="https://unpkg.com/@zxing/library@latest"></script>
     <script>
@@ -41,12 +41,12 @@
                             scanning = false;
                         }
                         if (error) {
-                            console.error('Eroare de scanare:', error);
+                            console.error('Eroare:', error);
                         }
                     });
                 })
                 .catch((err) => {
-                    console.error('Eroare la inițializarea camerei:', err);
+                    console.error('Eroare:', err);
                 });
         }
 

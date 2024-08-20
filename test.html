@@ -19,21 +19,19 @@
 
 <script>
     document.getElementById('scan-button').addEventListener('click', function() {
-        // Afișează containerul pentru cameră
         document.getElementById('scanner-container').style.display = 'block';
 
-        // Inițializează QuaggaJS
         Quagga.init({
             inputStream: {
                 name: "Live",
                 type: "LiveStream",
-                target: document.querySelector('#scanner-container'), // Containerul pentru cameră
+                target: document.querySelector('#scanner-container'), 
                 constraints: {
-                    facingMode: "environment" // Folosește camera din spate
+                    facingMode: "environment" 
                 }
             },
             decoder: {
-                readers: ["ean_reader"] // Adaugă specific pentru EAN-13
+                readers: ["ean_reader"]
             },
             debug: {
       drawBoundingBox: true,
@@ -44,25 +42,22 @@
             
         }, function(err) {
             if (err) {
-                console.error("Eroare la inițializare:", err);
-                alert("Eroare la inițializare: " + err.message);
+                console.error("Eroare ", err);
+                alert("Eroare : " + err.message);
                 return;
             }
-            console.log("QuaggaJS a fost inițializat cu succes.");
+            console.log("QuaggaJS succes");
             Quagga.start();
         });
 
-        // Manejează evenimentul de detectare a codului de bare
         Quagga.onDetected(function(result) {
             var code = result.codeResult.code;
             console.log("Cod detectat:", code);
 
-            // Setează codul de bare în input dacă are lungimea de 13 caractere (EAN-13)
             if (code.length === 13) {
                 document.getElementById('barcode-result').value = code;
-                Quagga.stop(); // Oprește scanarea
-                document.getElementById('scanner-container').style.display = 'none'; // Ascunde camera
-            } else {
+                Quagga.stop(); 
+                document.getElementById('scanner-container').style.display = 'none'; 
                 console.error("Codul detectat nu este un EAN-13 valid: ", code);
             }
         });
